@@ -40,7 +40,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         {
             case "access_denied":
                 // User said "no thanks"
-                return GetResponse("{}");
+                return GetResponse("{\"response\": {}}");
             default:
                 // Some other error occurred, return it
                 return GetResponse("{\"error\": \"" + error + "\"}");
