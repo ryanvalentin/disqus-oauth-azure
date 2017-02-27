@@ -81,7 +81,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             });
             var response = await client.PostAsync("https://disqus.com/api/oauth/2.0/access_token/", content);
 
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
 
             string jsonContent = await response.Content.ReadAsStringAsync();
 
