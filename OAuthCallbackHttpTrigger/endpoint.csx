@@ -35,7 +35,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     // Parse query parameters
     var queryParams = req.GetQueryNameValuePairs();
 
-    string error = GetParam("error");
+    string error = GetParam(queryParams, "error");
 
     if (!String.IsNullOrEmpty(error))
     {
@@ -51,7 +51,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         }
     }
 
-    string code = GetParam("code");
+    string code = GetParam(queryParams, "code");
 
     if (String.IsNullOrEmpty(code))
     {
