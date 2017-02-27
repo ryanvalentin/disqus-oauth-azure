@@ -62,7 +62,8 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             new KeyValuePair<string, string>("client_id", disqusApiKey),
             new KeyValuePair<string, string>("client_secret", disqusApiSecret),
             new KeyValuePair<string, string>("redirect_uri", redirectUri),
-            new KeyValuePair<string, string>("code", code)
+            new KeyValuePair<string, string>("code", code),
+            new KeyValuePair<string, string>("state", state)
         });
         var response = await client.PostAsync("https://disqus.com/api/oauth/2.0/access_token/", content);
 
