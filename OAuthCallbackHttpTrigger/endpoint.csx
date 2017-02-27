@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -27,11 +28,13 @@ private static string GetParam(IEnumerable<KeyValuePair<string, string>> query
         .Value;
 }
 
+// Make a request starting here:
+// https://disqus.com/api/oauth/2.0/authorize/?client_id=YOUR_API_KEY&scope=read,write,email&response_type=code
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
-    var response = new HttpResponseMessage();
+    string disqusApiKey = ConfigurationManager.AppSettings["DISQUS_API_KEY"];
+    string disqusApiSecret = ConfigurationManager.AppSettings["DISQUS_API_SECRET"];
 
-    // https://disqus.com/api/oauth/2.0/authorize/?client_id=hDuMtiXLQn5TarhIlbB9Q8hpYYvDRS2QPa64U31QIi1DVu5pB4epANLFQeey4HIB&scope=read,write,email&response_type=code
     log.Info("C# HTTP trigger function processed a request.");
 
     // Parse query parameters
@@ -59,10 +62,37 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     {
         return GetResponse(new Dictionary<string, string>()
             {
-                { "error", "There was an error logging in" }
+                { "error", "There was an error logging in." }
             },
             HttpStatusCode.BadRequest);
     }
 
-    return GetResponse(new Dictionary<string, string>() { { "code", code } }, HttpStatusCode.OK);
+    using (var client = new HttpClient())
+    {
+        try
+        {
+            var content = new ForumUrlEncodedContent(new []
+            {
+                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                new KeyValuePair<string, string>("client_id", disqusApiKey),
+                new KeyValuePair<string, string>("client_secret", disqusApiSecret),
+                new KeyValuePair<string, string>("redirect_uri", "authorization_code"),
+                new KeyValuePair<string, string>("code", code)
+            })
+            var response = await client.PostAsync("https://disqus.com/api/oauth/2.0/access_token/", content);
+
+            response.EnsureSuccessStatusCode();
+
+            string jsonContent = await response.Content.ReadAsStringAsync();
+
+            return GetResponse(new Dictionary<string, string>() { { "response", jsonContent } }, HttpStatusCode.OK);
+        }
+        catch
+        {
+            return GetResponse(new Dictionary<string, string>()
+            {
+                { "error", "There was an internal server error." }
+            }, HttpStatusCode.InternalServerError);
+        }
+    }
 }
