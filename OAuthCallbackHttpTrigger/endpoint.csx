@@ -71,7 +71,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     {
         try
         {
-            var content = new ForumUrlEncodedContent(new []
+            var content = new FormUrlEncodedContent(new []
             {
                 new KeyValuePair<string, string>("grant_type", "authorization_code"),
                 new KeyValuePair<string, string>("client_id", disqusApiKey),
