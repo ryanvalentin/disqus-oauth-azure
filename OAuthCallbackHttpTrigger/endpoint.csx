@@ -69,30 +69,18 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
     using (var client = new HttpClient())
     {
-        try
+        var content = new FormUrlEncodedContent(new []
         {
-            var content = new FormUrlEncodedContent(new []
-            {
-                new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                new KeyValuePair<string, string>("client_id", disqusApiKey),
-                new KeyValuePair<string, string>("client_secret", disqusApiSecret),
-                new KeyValuePair<string, string>("redirect_uri", "authorization_code"),
-                new KeyValuePair<string, string>("code", code)
-            });
-            var response = await client.PostAsync("https://disqus.com/api/oauth/2.0/access_token/", content);
+            new KeyValuePair<string, string>("grant_type", "authorization_code"),
+            new KeyValuePair<string, string>("client_id", disqusApiKey),
+            new KeyValuePair<string, string>("client_secret", disqusApiSecret),
+            new KeyValuePair<string, string>("redirect_uri", req.RequestUri.OriginalString.Split('?')[0]),
+            new KeyValuePair<string, string>("code", code)
+        });
+        var response = await client.PostAsync("https://disqus.com/api/oauth/2.0/access_token/", content);
 
-            //response.EnsureSuccessStatusCode();
+        string jsonContent = await response.Content.ReadAsStringAsync();
 
-            string jsonContent = await response.Content.ReadAsStringAsync();
-
-            return GetResponse(new Dictionary<string, string>() { { "response", jsonContent } }, HttpStatusCode.OK);
-        }
-        catch
-        {
-            return GetResponse(new Dictionary<string, string>()
-            {
-                { "error", "There was an internal server error." }
-            }, HttpStatusCode.InternalServerError);
-        }
+        return GetResponse(new Dictionary<string, string>() { { "response", jsonContent } }, HttpStatusCode.OK);
     }
 }
