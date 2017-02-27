@@ -44,10 +44,10 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         {
             case "access_denied":
                 // User said "no thanks"
-                return GetResponse(new Dictionary<string, string>(), HttpStatusCode.NoContent)
+                return GetResponse(new Dictionary<string, string>(), HttpStatusCode.NoContent);
             default:
                 // Some other error occurred, return it
-                return GetResponse(new Dictionary<string, string>() { { "error", error } }, HttpStatusCode.BadRequest)
+                return GetResponse(new Dictionary<string, string>() { { "error", error } }, HttpStatusCode.BadRequest);
         }
     }
 
@@ -62,5 +62,5 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             HttpStatusCode.BadRequest);
     }
 
-    return GetResponse(new Dictionary<string, string>() { { "code", code } }, HttpStatusCode.OK)
+    return GetResponse(new Dictionary<string, string>() { { "code", code } }, HttpStatusCode.OK);
 }
