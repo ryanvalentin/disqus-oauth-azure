@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 
 private static HttpResponseMessage GetResponse(Dictionary<string, string> payload, HttpStatusCode status)
 {
