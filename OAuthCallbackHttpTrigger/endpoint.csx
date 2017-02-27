@@ -4,15 +4,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
-private static HttpResponseMessage GetResponse(Dictionary<string, string> payload, HttpStatusCode status)
+private static HttpResponseMessage GetResponse(string jsonString)
 {
     var response = new HttpResponseMessage();
+
     StringBuilder sb = new StringBuilder();
     sb.Append("<html><body>");
-    foreach (var kv in payload)
-    {
-        sb.AppendFormat("<p>Adding '{0}' with value '{1}'</p>", kv.Key, kv.Value);
-    }
+    sb.Append(jsonString);
     sb.Append("</body></html>");
 
     response.Content = new StringContent(sb.ToString());
@@ -35,7 +33,10 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     string disqusApiKey = ConfigurationManager.AppSettings["DISQUS_API_KEY"];
     string disqusApiSecret = ConfigurationManager.AppSettings["DISQUS_API_SECRET"];
 
-    log.Info("C# HTTP trigger function processed a request.");
+    log.Info("Processing OAuth callback...");
+    log.Info("Request URI: " + req.RequestUri.OriginalString);
+    log.Info("API Key: " + disqusApiKey);
+    log.Info("Secret Key: " + disqusApiSecret);
 
     // Parse query parameters
     var queryParams = req.GetQueryNameValuePairs();
@@ -49,23 +50,17 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         {
             case "access_denied":
                 // User said "no thanks"
-                return GetResponse(new Dictionary<string, string>(), HttpStatusCode.NoContent);
+                return GetResponse("{}");
             default:
                 // Some other error occurred, return it
-                return GetResponse(new Dictionary<string, string>() { { "error", error } }, HttpStatusCode.BadRequest);
+                return GetResponse("{\"error\": \"" + error + "\"}");
         }
     }
 
     string code = GetParam(queryParams, "code");
 
     if (String.IsNullOrEmpty(code))
-    {
-        return GetResponse(new Dictionary<string, string>()
-            {
-                { "error", "There was an error logging in." }
-            },
-            HttpStatusCode.BadRequest);
-    }
+        return GetResponse("{}");
 
     using (var client = new HttpClient())
     {
@@ -81,6 +76,6 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
         string jsonContent = await response.Content.ReadAsStringAsync();
 
-        return GetResponse(new Dictionary<string, string>() { { "response", jsonContent } }, HttpStatusCode.OK);
+        return GetResponse(jsonContent);
     }
 }
