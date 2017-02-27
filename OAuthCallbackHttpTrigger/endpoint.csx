@@ -74,7 +74,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             new KeyValuePair<string, string>("grant_type", "authorization_code"),
             new KeyValuePair<string, string>("client_id", disqusApiKey),
             new KeyValuePair<string, string>("client_secret", disqusApiSecret),
-            new KeyValuePair<string, string>("redirect_uri", req.RequestUri.OriginalString.Split('?')[0]),
+            new KeyValuePair<string, string>("redirect_uri", "https://dsqoauthexample.azurewebsites.net/api/OAuthCallbackHttpTrigger/"),
             new KeyValuePair<string, string>("code", code)
         });
         var response = await client.PostAsync("https://disqus.com/api/oauth/2.0/access_token/", content);
