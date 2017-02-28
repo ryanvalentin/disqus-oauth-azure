@@ -10,7 +10,7 @@ private static HttpResponseMessage GetResponse(string jsonString, string state =
 
     response.StatusCode = HttpStatusCode.Moved;
     //response.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-    response.Headers.Location = new Uri("com.disqusoauthexample.disqus_oauth_example://authorization?payload=" + Uri.EscapeDataString(jsonString) + "&state=" + state);
+    response.Headers.Location = new Uri("disqusoauthexample://authorization?payload=" + Uri.EscapeDataString(jsonString) + "&state=" + state);
 
     return response;
 }
