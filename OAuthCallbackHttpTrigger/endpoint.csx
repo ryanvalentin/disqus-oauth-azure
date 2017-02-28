@@ -8,8 +8,9 @@ private static HttpResponseMessage GetResponse(string jsonString, string state =
 {
     var response = new HttpResponseMessage();
 
-    response.Content = new StringContent(jsonString + Environment.NewLine + state);
-    response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+    response.StatusCode = HttpStatusCode.Moved;
+    response.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+    response.Headers.Location = new Uri("com.disqusoauthexample.disqus_oauth_example://authorization?payload=" + HttpUtility.UrlEncode(jsonString) + "&state=" + state);
 
     return response;
 }
