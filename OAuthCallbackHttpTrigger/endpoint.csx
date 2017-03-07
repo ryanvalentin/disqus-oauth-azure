@@ -3,14 +3,50 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Web.Helpers;
 
 private static HttpResponseMessage GetResponse(string jsonString, string state = "")
 {
     var response = new HttpResponseMessage();
+    dynamic authData = Json.Decode(jsonString);
 
-    response.StatusCode = HttpStatusCode.Moved;
-    //response.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-    response.Headers.Location = new Uri("disqusoauthexample://authorization?payload=" + Uri.EscapeDataString(jsonString) + "&state=" + state);
+    StringBuilder tmpl = new StringBuilder();
+    tmpl.Append("<html>");
+    tmpl.Append("<head>");
+    tmpl.Append("<title>You're logged in</title>");
+    tmpl.Append("</head>");
+    tmpl.Append("<body>");
+    tmpl.Append("<div>");
+
+    try
+    {
+        // Currently logged-in user
+        tmpl.Append("<p>");
+        tmpl.AppendFormat("<img width=\"92\" height=\"92\" src=\"https://disqus.com/api/users/avatars/{0}.jpg\">", authData.username);
+        tmpl.Append("<br />");
+        tmpl.AppendFormat("You're logged in as <a href=\"https://disqus.com/by/{0}/\" target=\"_blank\">{1}</a>.", authData.username, authData.username)
+        tmpl.Append("</p>");
+    }
+    catch (System.Exception)
+    {
+        // Username wasn't in response and was likely an error.
+        tmpl.Append("<p>");
+        tmpl.AppendFormat("There was an error logging you in.");
+        tmpl.Append("</p>");
+    }
+
+    // Return to app button
+    tmpl.Append("<p>");
+    tmpl.AppendFormat("<a href=\"disqusoauthexample://authorization?payload={0}&state={1}\">Back to app</a>", Uri.EscapeDataString(jsonString), state);
+    tmpl.Append("</p>");
+
+    tmpl.Append("</div>");
+    tmpl.Append("</body>");
+    tmpl.Append("</html>");
+
+    response.StatusCode = HttpStatusCode.OK;
+    response.Content = new StringContent(tmpl.ToString());
+    response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
 
     return response;
 }
