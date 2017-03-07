@@ -1,14 +1,16 @@
+#r Newtonsoft.Json
+
+using Newtonsoft.Json.Linq;
 using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Web.Helpers;
 
 private static HttpResponseMessage GetResponse(string jsonString, string state = "")
 {
     var response = new HttpResponseMessage();
-    dynamic authData = Json.Decode(jsonString);
+    dynamic authData = JObject.Parse(jsonString);
 
     StringBuilder tmpl = new StringBuilder();
     tmpl.Append("<html>");
