@@ -1,4 +1,4 @@
-#r Newtonsoft.Json
+#r "Newtonsoft.Json"
 
 using Newtonsoft.Json.Linq;
 using System.Configuration;
@@ -26,7 +26,7 @@ private static HttpResponseMessage GetResponse(string jsonString, string state =
         tmpl.Append("<p>");
         tmpl.AppendFormat("<img width=\"92\" height=\"92\" src=\"https://disqus.com/api/users/avatars/{0}.jpg\">", authData.username);
         tmpl.Append("<br />");
-        tmpl.AppendFormat("You're logged in as <a href=\"https://disqus.com/by/{0}/\" target=\"_blank\">{1}</a>.", authData.username, authData.username)
+        tmpl.AppendFormat("You're logged in as <a href=\"https://disqus.com/by/{0}/\" target=\"_blank\">{1}</a>.", authData.username, authData.username);
         tmpl.Append("</p>");
     }
     catch (System.Exception)
